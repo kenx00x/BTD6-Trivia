@@ -54,6 +54,7 @@ namespace Trivia
             input = input.Replace("&ldquo;", "\"");
             input = input.Replace("&rdquo;", "\"");
             input = input.Replace("&eacute;", "é");
+            input = input.Replace("&amp;", "&");
             return input;
         }
         public override void OnGUI()
@@ -77,11 +78,11 @@ namespace Trivia
                 {
                     checkAnswer(answers[0]);
                 }
-                if (GUI.Button(new Rect(Screen.width / 2, 90, 400, 30), answers[1], buttonStyle)) 
+                if (GUI.Button(new Rect(Screen.width / 2, 90, 400, 30), answers[1], buttonStyle))
                 {
                     checkAnswer(answers[1]);
                 }
-                if (GUI.Button(new Rect(Screen.width / 2 - 400, 120, 400, 30), answers[2], buttonStyle)) 
+                if (GUI.Button(new Rect(Screen.width / 2 - 400, 120, 400, 30), answers[2], buttonStyle))
                 {
                     checkAnswer(answers[2]);
                 }
@@ -95,8 +96,8 @@ namespace Trivia
         {
             if (correctAnswer == answer)
             {
-                InGame.Bridge.simulation.cashManagers.entries[0].value.cash.Value += staticRound*multiplier;
-                MelonLogger.Log($"Correct, adding {staticRound*multiplier} cash");
+                InGame.Bridge.simulation.cashManagers.entries[0].value.cash.Value += staticRound * multiplier;
+                MelonLogger.Log($"Correct, adding {staticRound * multiplier} cash");
             }
             else
             {
@@ -116,7 +117,7 @@ namespace Trivia
             {
                 if (question == "")
                 {
-                    staticRound = round+2;
+                    staticRound = round + 2;
                     System.Random rand = new System.Random();
                     string json = new WebClient().DownloadString("https://opentdb.com/api.php?amount=1");
                     JObject rss = JObject.Parse(json);
