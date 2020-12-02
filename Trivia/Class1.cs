@@ -7,7 +7,7 @@ using Newtonsoft.Json.Linq;
 using System.IO;
 using System.Net;
 using UnityEngine;
-[assembly: MelonInfo(typeof(Trivia.Class1), "Trivia", "1.1.1", "kenx00x")]
+[assembly: MelonInfo(typeof(Trivia.Class1), "Trivia", "1.1.2", "kenx00x")]
 [assembly: MelonGame("Ninja Kiwi", "BloonsTD6")]
 namespace Trivia
 {
