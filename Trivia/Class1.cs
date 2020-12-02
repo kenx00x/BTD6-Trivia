@@ -7,7 +7,7 @@ using Newtonsoft.Json.Linq;
 using System.IO;
 using System.Net;
 using UnityEngine;
-[assembly: MelonInfo(typeof(Trivia.Class1), "Trivia", "1.1.0", "kenx00x")]
+[assembly: MelonInfo(typeof(Trivia.Class1), "Trivia", "1.1.1", "kenx00x")]
 [assembly: MelonGame("Ninja Kiwi", "BloonsTD6")]
 namespace Trivia
 {
@@ -61,7 +61,6 @@ namespace Trivia
             if (question != "")
             {
                 GUIStyle questionStyle = new GUIStyle();
-                GUIStyle buttonStyle = new GUIStyle();
                 questionStyle.alignment = TextAnchor.MiddleCenter;
                 questionStyle.normal.textColor = Color.white;
                 Texture2D blackTexture = new Texture2D(1, 1);
@@ -71,7 +70,7 @@ namespace Trivia
                 Texture2D grayTexture = new Texture2D(1, 1);
                 grayTexture.SetPixel(0, 0, Color.gray);
                 grayTexture.Apply();
-                buttonStyle = questionStyle;
+                GUIStyle buttonStyle = questionStyle;
                 buttonStyle.hover.background = grayTexture;
                 GUI.Label(new Rect(Screen.width / 2 - 400, 40, 800, 50f), question, questionStyle);
                 if (GUI.Button(new Rect(Screen.width / 2 - 400, 90, 400, 30), answers[0], buttonStyle))
@@ -97,6 +96,11 @@ namespace Trivia
             if (correctAnswer == answer)
             {
                 InGame.Bridge.simulation.cashManagers.entries[0].value.cash.Value += staticRound*multiplier;
+                MelonLogger.Log($"Correct, adding {staticRound*multiplier} cash");
+            }
+            else
+            {
+                MelonLogger.Log($"Wrong, correct answer was: {correctAnswer}");
             }
             for (int i = 0; i < answers.Length - 1; i++)
             {
@@ -112,7 +116,7 @@ namespace Trivia
             {
                 if (question == "")
                 {
-                    staticRound = round;
+                    staticRound = round+2;
                     System.Random rand = new System.Random();
                     string json = new WebClient().DownloadString("https://opentdb.com/api.php?amount=1");
                     JObject rss = JObject.Parse(json);
