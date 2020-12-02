@@ -4,15 +4,18 @@ using Assets.Scripts.Unity.UI_New.Main;
 using Harmony;
 using MelonLoader;
 using Newtonsoft.Json.Linq;
-using System;
+using System.IO;
 using System.Net;
 using UnityEngine;
-[assembly: MelonInfo(typeof(Trivia.Class1), "Trivia", "1.0.0", "kenx00x")]
+[assembly: MelonInfo(typeof(Trivia.Class1), "Trivia", "1.1.0", "kenx00x")]
 [assembly: MelonGame("Ninja Kiwi", "BloonsTD6")]
 namespace Trivia
 {
     public class Class1 : MelonMod
     {
+        public static string dir = $"{Directory.GetCurrentDirectory()}\\Mods\\Trivia";
+        public static string config = $"{dir}\\config.txt";
+        public static int multiplier = 25;
         public static string question = "";
         public static string[] answers = new string[4];
         public static string correctAnswer = "";
@@ -20,6 +23,29 @@ namespace Trivia
         public override void OnApplicationStart()
         {
             MelonLogger.Log("Trivia loaded");
+            Directory.CreateDirectory($"{dir}");
+            if (File.Exists(config))
+            {
+                MelonLogger.Log("Reading config file");
+                using (StreamReader sr = File.OpenText(config))
+                {
+                    string s = "";
+                    while ((s = sr.ReadLine()) != null)
+                    {
+                        multiplier = int.Parse(s.Substring(s.IndexOf(char.Parse("=")) + 1));
+                    }
+                }
+                MelonLogger.Log("Done reading");
+            }
+            else
+            {
+                MelonLogger.Log("Creating config file");
+                using (StreamWriter sw = File.CreateText(config))
+                {
+                    sw.WriteLine("Multiplier=25");
+                }
+                MelonLogger.Log("Done Creating");
+            }
         }
         private static string ReplaceText(string input)
         {
@@ -70,7 +96,7 @@ namespace Trivia
         {
             if (correctAnswer == answer)
             {
-                InGame.Bridge.simulation.cashManagers.entries[0].value.cash.Value += staticRound*25;
+                InGame.Bridge.simulation.cashManagers.entries[0].value.cash.Value += staticRound*multiplier;
             }
             for (int i = 0; i < answers.Length - 1; i++)
             {
