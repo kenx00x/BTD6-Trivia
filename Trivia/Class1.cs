@@ -7,7 +7,7 @@ using Newtonsoft.Json.Linq;
 using System.IO;
 using System.Net;
 using UnityEngine;
-[assembly: MelonInfo(typeof(Trivia.Class1), "Trivia", "1.1.2", "kenx00x")]
+[assembly: MelonInfo(typeof(Trivia.Class1), "Trivia", "1.1.3", "kenx00x")]
 [assembly: MelonGame("Ninja Kiwi", "BloonsTD6")]
 namespace Trivia
 {
@@ -46,16 +46,6 @@ namespace Trivia
                 }
                 MelonLogger.Log("Done Creating");
             }
-        }
-        private static string ReplaceText(string input)
-        {
-            input = input.Replace("&quot;", "\"");
-            input = input.Replace("&#039;", "'");
-            input = input.Replace("&ldquo;", "\"");
-            input = input.Replace("&rdquo;", "\"");
-            input = input.Replace("&eacute;", "é");
-            input = input.Replace("&amp;", "&");
-            return input;
         }
         public override void OnGUI()
         {
@@ -121,13 +111,13 @@ namespace Trivia
                     System.Random rand = new System.Random();
                     string json = new WebClient().DownloadString("https://opentdb.com/api.php?amount=1");
                     JObject rss = JObject.Parse(json);
-                    question = ReplaceText((string)rss.SelectToken("results[0].question"));
-                    correctAnswer = ReplaceText((string)rss.SelectToken("results[0].correct_answer"));
+                    question = WebUtility.HtmlDecode((string)rss.SelectToken("results[0].question"));
+                    correctAnswer = WebUtility.HtmlDecode((string)rss.SelectToken("results[0].correct_answer"));
                     answers[3] = correctAnswer;
                     JArray wrongAnswers = (JArray)rss.SelectToken("results[0].incorrect_answers");
                     for (int i = 0; i < wrongAnswers.Count; i++)
                     {
-                        wrongAnswers[i] = ReplaceText(wrongAnswers[i].ToString());
+                        wrongAnswers[i] = WebUtility.HtmlDecode(wrongAnswers[i].ToString());
                         answers[i] = wrongAnswers[i].ToString();
                     }
                     for (int i = 0; i < answers.Length - 1; i++)
