@@ -7,7 +7,7 @@ using Newtonsoft.Json.Linq;
 using System.IO;
 using System.Net;
 using UnityEngine;
-[assembly: MelonInfo(typeof(Trivia.Class1), "Trivia", "1.1.3", "kenx00x")]
+[assembly: MelonInfo(typeof(Trivia.Class1), "Trivia", "1.2.0", "kenx00x")]
 [assembly: MelonGame("Ninja Kiwi", "BloonsTD6")]
 namespace Trivia
 {
@@ -15,7 +15,11 @@ namespace Trivia
     {
         public static string dir = $"{Directory.GetCurrentDirectory()}\\Mods\\Trivia";
         public static string config = $"{dir}\\config.txt";
-        public static int multiplier = 25;
+        public static double multiplier = 25;
+        public static double easyMultiplier = 1;
+        public static double mediumMultiplier = 1;
+        public static double hardMultiplier = 1;
+        public static string difficulty = "";
         public static string question = "";
         public static string[] answers = new string[4];
         public static string correctAnswer = "";
@@ -29,10 +33,26 @@ namespace Trivia
                 MelonLogger.Log("Reading config file");
                 using (StreamReader sr = File.OpenText(config))
                 {
+                    int line = 0;
                     string s = "";
                     while ((s = sr.ReadLine()) != null)
                     {
-                        multiplier = int.Parse(s.Substring(s.IndexOf(char.Parse("=")) + 1));
+                        switch (line)
+                        {
+                            case 0:
+                                multiplier = double.Parse(s.Substring(s.IndexOf(char.Parse("=")) + 1));
+                                break;
+                            case 1:
+                                easyMultiplier = double.Parse(s.Substring(s.IndexOf(char.Parse("=")) + 1));
+                                break;
+                            case 2:
+                                mediumMultiplier = double.Parse(s.Substring(s.IndexOf(char.Parse("=")) + 1));
+                                break;
+                            case 3:
+                                hardMultiplier = double.Parse(s.Substring(s.IndexOf(char.Parse("=")) + 1));
+                                break;
+                        }
+                        line++;
                     }
                 }
                 MelonLogger.Log("Done reading");
@@ -43,6 +63,9 @@ namespace Trivia
                 using (StreamWriter sw = File.CreateText(config))
                 {
                     sw.WriteLine("Multiplier=25");
+                    sw.WriteLine("EasyMultiplier=1");
+                    sw.WriteLine("MediumMultiplier=1");
+                    sw.WriteLine("HardMultiplier=1");
                 }
                 MelonLogger.Log("Done Creating");
             }
@@ -86,8 +109,21 @@ namespace Trivia
         {
             if (correctAnswer == answer)
             {
-                InGame.Bridge.simulation.cashManagers.entries[0].value.cash.Value += staticRound * multiplier;
-                MelonLogger.Log($"Correct, adding {staticRound * multiplier} cash");
+                double addedMoney = 0;
+                switch (difficulty)
+                {
+                    case "Easy":
+                        addedMoney = staticRound * multiplier * easyMultiplier;
+                        break;
+                    case "Medium":
+                        addedMoney = staticRound * multiplier * mediumMultiplier;
+                        break;
+                    case "Hard":
+                        addedMoney = staticRound * multiplier * hardMultiplier;
+                        break;
+                }
+                InGame.Bridge.simulation.cashManagers.entries[0].value.cash.Value += addedMoney;
+                MelonLogger.Log($"Correct, adding {addedMoney} cash");
             }
             else
             {
@@ -137,6 +173,15 @@ namespace Trivia
             public static void Postfix()
             {
                 question = "";
+            }
+        }
+        [HarmonyPatch(typeof(Simulation), "InitialiseDifficulty")]
+        public class UnityToSimulation_Patch
+        {
+            [HarmonyPostfix]
+            public static void Postfix(string newDifficulty)
+            {
+                difficulty = newDifficulty;
             }
         }
     }
