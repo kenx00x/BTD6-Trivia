@@ -1,4 +1,5 @@
-﻿using Assets.Scripts.Simulation;
+﻿using Assets.Scripts.Models.Profile;
+using Assets.Scripts.Simulation;
 using Assets.Scripts.Unity.UI_New.InGame;
 using Assets.Scripts.Unity.UI_New.Main;
 using Harmony;
@@ -7,7 +8,7 @@ using Newtonsoft.Json.Linq;
 using System.IO;
 using System.Net;
 using UnityEngine;
-[assembly: MelonInfo(typeof(Trivia.Class1), "Trivia", "1.2.0", "kenx00x")]
+[assembly: MelonInfo(typeof(Trivia.Class1), "Trivia", "1.3.0", "kenx00x")]
 [assembly: MelonGame("Ninja Kiwi", "BloonsTD6")]
 namespace Trivia
 {
@@ -175,13 +176,13 @@ namespace Trivia
                 question = "";
             }
         }
-        [HarmonyPatch(typeof(Simulation), "InitialiseDifficulty")]
-        public class UnityToSimulation_Patch
+        [HarmonyPatch(typeof(MapInfo), "GetDifficulty")]
+        public class MapInfo_Patch
         {
             [HarmonyPostfix]
-            public static void Postfix(string newDifficulty)
+            public static void Postfix(string difficultyName)
             {
-                difficulty = newDifficulty;
+                difficulty = difficultyName;
             }
         }
     }
